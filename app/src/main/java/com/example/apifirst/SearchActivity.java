@@ -1,5 +1,7 @@
 package com.example.apifirst;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.widget.Toast;
 
 import ClientAPI.EmployeeAPI;
 import model.Employee;
+import model.EmployeeCUD;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -19,6 +22,10 @@ public class SearchActivity extends AppCompatActivity {
     private static final String BaseURL ="http://dummy.restapiexample.com/api/v1/";
     private EditText  etID, etName, etSalary, etAge, etProfile;
     private Button btnSearch, btnUpdate, btnDelete;
+
+    EmployeeAPI employeeAPI;
+    AlertDialog.Builder alert;
+
 
 
     @Override
@@ -35,6 +42,8 @@ public class SearchActivity extends AppCompatActivity {
         btnSearch= findViewById(R.id.btnSearch);
         btnUpdate = findViewById(R.id.btnUpdate);
         btnDelete = findViewById(R.id.btnDelete);
+        alert = new AlertDialog.Builder(this);
+
 
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,7 +56,7 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-//                UpdateEmployee();
+                UpdateEmployee();
 
             }
         });
@@ -55,6 +64,23 @@ public class SearchActivity extends AppCompatActivity {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                alert.setMessage("Do you want to delete?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                DeleteEmployee();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                AlertDialog alertDialog =  alert.create();
+                alertDialog.setTitle("Delete Employee");
+                alertDialog.show();
 
             }
         });
@@ -62,8 +88,8 @@ public class SearchActivity extends AppCompatActivity {
 
     private void loadData() {
         Retrofit retrofit = new Retrofit.Builder()
-                            .baseUrl(BaseURL)
-                            .addConverterFactory(GsonConverterFactory.create()).build();
+                .baseUrl(BaseURL)
+                .addConverterFactory(GsonConverterFactory.create()).build();
 
         EmployeeAPI employeeAPI = retrofit.create(EmployeeAPI.class);
 
@@ -75,12 +101,62 @@ public class SearchActivity extends AppCompatActivity {
                 etName.setText(response.body().getEmployee_name());
                 etSalary.setText(Float.toString(response.body().getEmployee_salary()));
                 etAge.setText(Integer.toString(response.body().getEmployee_age()));
-                        etProfile.setText(response.body().getProfile_image());
+                etProfile.setText(response.body().getProfile_image());
             }
 
             @Override
             public void onFailure(Call<Employee> call, Throwable t) {
                 Toast.makeText(getApplicationContext(),"Error"+t.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void UpdateEmployee(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BaseURL)
+                .addConverterFactory(GsonConverterFactory.create()).build();
+
+        EmployeeAPI employeeAPI = retrofit.create(EmployeeAPI.class);
+        EmployeeCUD employee = new EmployeeCUD(
+                etName.getText().toString(),
+                Float.parseFloat(etSalary.getText().toString()),
+                Integer.parseInt(etAge.getText().toString())
+        );
+
+        Call<Void> voidCall = employeeAPI.updateEmployee(Integer.parseInt(etID.getText().toString()), employee);
+
+        voidCall.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                Toast.makeText(SearchActivity.this, "Successfully updated",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(SearchActivity.this, "Error"+t.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
+
+    private void DeleteEmployee(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BaseURL)
+                .addConverterFactory(GsonConverterFactory.create()).build();
+
+        EmployeeAPI employeeAPI = retrofit.create(EmployeeAPI.class);
+        Call<Void> voidCall = employeeAPI.deleteEmployee(Integer.parseInt(etID.getText().toString()));
+
+        voidCall.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                Toast.makeText(SearchActivity.this, "Successfully Deleted",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(SearchActivity.this,"Error "+ t.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
+
             }
         });
     }

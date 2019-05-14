@@ -9,13 +9,6 @@
     tools:context=".RegisterActivity">
 
     <EditText
-        android:id="@+id/etID"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="ID"
-        android:layout_marginTop="10dp"
-        android:textSize="30sp"/>
-    <EditText
         android:id="@+id/etName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,13 +29,7 @@
         android:hint="Age"
         android:layout_marginTop="10dp"
         android:textSize="30sp"/>
-    <EditText
-        android:id="@+id/etProfile"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Profile Image"
-        android:layout_marginTop="10dp"
-        android:textSize="30sp"/>
+
 
     <Button
         android:id="@+id/btnRegister"
