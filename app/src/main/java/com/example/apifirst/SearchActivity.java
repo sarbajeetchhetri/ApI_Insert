@@ -21,18 +21,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class SearchActivity extends AppCompatActivity {
     private static final String BaseURL ="http://dummy.restapiexample.com/api/v1/";
     private EditText  etID, etName, etSalary, etAge, etProfile;
+
     private Button btnSearch, btnUpdate, btnDelete;
 
     EmployeeAPI employeeAPI;
     AlertDialog.Builder alert;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-
         etID = findViewById(R.id.etEmpID);
         etName = findViewById(R.id.etName);
         etSalary = findViewById(R.id.etSalary);
